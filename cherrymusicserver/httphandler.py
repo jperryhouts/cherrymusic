@@ -197,7 +197,7 @@ class HTTPHandler(object):
             else:
                 return False
         elif sessionUsername != nameById:
-            self.api_logout(value=None)
+            self.api_logout()
             return False
         return True
 
@@ -654,7 +654,12 @@ class HTTPHandler(object):
         return playlists
 
     def api_logout(self):
-        cherrypy.lib.sessions.expire()
+        sess = cherrypy.session
+        username = sess.get('userid', None)
+        sess['userid'] = None
+        if username:
+            cherrypy.request.login = None
+#        cherrypy.lib.sessions.expire()
     api_logout.no_auth = True
 
     def api_downloadpls(self, plid, hostaddr):
