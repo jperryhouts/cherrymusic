@@ -46,12 +46,15 @@ def isWindows():
 def isLinux():
     return sys.platform.startswith('linux')
 
+def isFreeBSD():
+    return sys.platform.startswith('freebsd')
+
 def isOSX():
     return sys.platform.startswith('darwin')
 
 def getUserDataPath():
     userdata = ''
-    if isLinux():
+    if isLinux() or isFreeBSD():
         if 'XDG_DATA_HOME' in os.environ:
             userdata = os.path.join(os.environ['XDG_DATA_HOME'],userDataFolderName)
         else:
@@ -71,7 +74,7 @@ def getConfigPath():
         return sys.argv[2]
     else:
         configpath = ''
-        if isLinux():
+        if isLinux() or isFreeBSD():
             if 'XDG_CONFIG_HOME' in os.environ:
                 configpath = os.path.join(os.environ['XDG_CONFIG_HOME'], configFolderName)
             else:
