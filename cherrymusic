@@ -164,6 +164,7 @@ parser.add_argument('--dropfiledb', dest='dropfiledb', action='store_true', help
 parser.add_argument('--setup', dest='setup', action='store_true', help='Configure CherryMusic in your browser.')
 
 parser.add_argument('--adduser', dest='adduser', nargs=2, metavar=('USERNAME', 'PASSWORD'), default=None, help='Create a new user with the given password.')
+parser.add_argument('--newadmin', dest='newadmin', nargs=2, metavar=('USERNAME', 'PASSWORD'), default=None, help='Create a new administrator with the given password.')
 parser.add_argument('--deleteuser', dest='deleteuser', nargs=1, metavar=('USERNAME',), default=None, help='Delete a user')
 parser.add_argument('--changepassword', dest='changepassword', nargs=2, metavar=('USERNAME', 'PASSWORD'), default=None, help='Change the password of a user')
 
@@ -216,6 +217,11 @@ if __name__ == "__main__":
     if args.adduser:
         username, password = args.adduser
         success = cherrymusicserver.create_user(username, password)
+        sys.exit(0 if success else 1)
+
+    if args.newadmin:
+        username, password = args.newadmin
+        success = cherrymusicserver.create_admin(username, password)
         sys.exit(0 if success else 1)
 
     if args.deleteuser:

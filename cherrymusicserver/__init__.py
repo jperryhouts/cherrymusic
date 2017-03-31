@@ -298,6 +298,14 @@ def create_user(username, password):
         return False
     return service.get('users').addUser(username, password, admin=False)
 
+def create_admin(username, password):
+    """ Creates an admin user with given username and password """
+    non_alnum = re.compile('[^a-z0-9]', re.IGNORECASE)
+    if non_alnum.findall(username):
+        log.e(_('usernames may only contain letters and digits'))
+        return False
+    return service.get('users').addUser(username, password, admin=True)
+
 def delete_user(username):
     userservice = service.get('users')
     userid = userservice.getIdByName(username)
