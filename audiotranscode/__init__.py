@@ -52,7 +52,7 @@ class Transcoder(object):
     def available(self):
         """checks if the command defined in the encoder or decoder is
         available by calling it once"""
-        return bool(find_executable(self.command[0]))
+        return bool(find_executable(self.command[0], '/sbin:/bin:/usr/sbin:/usr/bin:/usr/games:/usr/local/sbin:/usr/local/bin:/root/bin'))
 
 
 class Encoder(Transcoder):
@@ -72,11 +72,13 @@ class Encoder(Transcoder):
             cmd[cmd.index('BITRATE')] = str(bitrate)
         if 'KBITRATE' in cmd:
             cmd[cmd.index('KBITRATE')] = str(bitrate) + 'k'
+        env = os.environ
+        env['PATH'] = '/sbin:/bin:/usr/sbin:/usr/bin:/usr/games:/usr/local/sbin:/usr/local/bin:/root/bin'+env['PATH']
         return subprocess.Popen(cmd,
                                 stdin=decoder_process.stdout,
                                 stdout=subprocess.PIPE,
-                                stderr=Transcoder.devnull
-                                )
+                                stderr=Transcoder.devnull,
+                                env=env)
 
     def __str__(self):
         return "<Encoder type='%s' cmd='%s'>" % (self.filetype,
@@ -103,10 +105,12 @@ class Decoder(Transcoder):
         if 'STARTTIME' in cmd:
             hours, minutes, seconds = starttime//3600, starttime//60%60, starttime%60
             cmd[cmd.index('STARTTIME')] = '%d:%d:%d' % (hours, minutes, seconds)
+        env = os.environ
+        env['PATH'] = '/sbin:/bin:/usr/sbin:/usr/bin:/usr/games:/usr/local/sbin:/usr/local/bin:/root/bin'+env['PATH']
         return subprocess.Popen(cmd,
                                 stdout=subprocess.PIPE,
-                                stderr=Transcoder.devnull
-                                )
+                                stderr=Transcoder.devnull,
+                                env=env)
 
     def __str__(self):
         return "<Decoder type='%s' cmd='%s'>" % (self.filetype,
