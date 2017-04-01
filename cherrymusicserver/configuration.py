@@ -100,6 +100,13 @@ def from_defaults():
                     album.
                             """)
 
+    with c['media.lastfm_api_key'] as lastfmapi:
+        lastfmapi.value = None
+        # i18n: Don't mind whitespace - string will be re-wrapped automatically. Use blank lines to separate paragraphs.
+        lastfmapi.doc = _("""
+                    API key for fetching cover art from lastfm.
+                            """)
+
     with c['media.show_subfolder_count'] as subfoldercount:
         subfoldercount.value = True
         # i18n: Don't mind whitespace - string will be re-wrapped automatically. Use blank lines to separate paragraphs.

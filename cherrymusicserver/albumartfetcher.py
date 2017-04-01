@@ -34,6 +34,8 @@ try:
     import urllib.parse
 except ImportError:
     import backport.urllib as urllib
+
+import json
 import os.path
 import codecs
 import re
@@ -41,7 +43,7 @@ import subprocess
 
 from tinytag import TinyTag
 
-from cherrymusicserver import log
+from cherrymusicserver import log, config
 
 #unidecode is opt-dependency
 try:
@@ -81,22 +83,29 @@ class AlbumArtFetcher:
 
     methods = {
         'itunes': {
-            'url': "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/wa/wsSearch?entity=album&term=",
+            'url': "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/wa/wsSearch?entity=album&term={}",
+            'parse': 'regex',
             'regexes': [
                 'artworkUrl60":"([^"]+)"',
             ],
         },
         'amazon': {
-            'url': "http://www.amazon.com/s/?field-keywords=",
+            'url': "http://www.amazon.com/s/?field-keywords={}",
+            'parse': 'regex',
             'regexes': [
                 '<img[^>]+?alt="Product Details"[^>]+?src="([^"]+)"',
                 '<img[^>]+?src="([^"]+)"[^>]+?alt="Product Details"'],
         },
         'bestbuy.com': {
-            'url': 'http://www.bestbuy.com/site/searchpage.jsp?_dyncharset=UTF-8&id=pcat17071&st=',
+            'url': 'http://www.bestbuy.com/site/searchpage.jsp?_dyncharset=UTF-8&id=pcat17071&st={}',
+            'parse': 'regex',
             'regexes': ['<div class="thumb".+?<img.+?src="([^"]+)"'],
             'user_agent': 'curl/7.52.1',
         },
+        'last.fm': {
+            'url': 'https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist={}&api_key={}&format=json',
+            'parse': 'json'
+        }
         # buy.com is now rakuten.com
         # with a new search API that nobody bothered to figure out yet
         # 'buy.com': {
@@ -105,7 +114,7 @@ class AlbumArtFetcher:
         # },
     }
 
-    def __init__(self, method='itunes', timeout=10):
+    def __init__(self, method='last.fm', timeout=10):
         """define the urls of the services and a regex to fetch images
         """
         self.MAX_IMAGE_SIZE_BYTES = 100*1024
@@ -176,18 +185,27 @@ class AlbumArtFetcher:
             list of urls
         """
         # choose the webservice to retrieve the images from
-        method = self.methods[self.method]
-        user_agent = method.get('user_agent')
+        searchmethod = self.methods[self.method]
+        user_agent = searchmethod.get('user_agent')
         # use unidecode if it's available
         searchterm = unidecode(searchterm).lower()
         # the keywords must always be appenable to the method-url
-        url = method['url']+urllib.parse.quote(searchterm)
+        if self.method == 'last.fm':
+            url = searchmethod['url'].format(urllib.parse.quote(searchterm), config['media.lastfm_api_key'])
+        else:
+            url = searchmethod['url'].format(urllib.parse.quote(searchterm))
         #download the webpage and decode the data to utf-8
         html = codecs.decode(self.retrieveData(url, user_agent)[0], 'UTF-8')
         # fetch all urls in the page
         matches = []
-        for regex in method['regexes']:
-            matches += re.findall(regex, html, re.DOTALL)
+        if searchmethod['parse'] == 'regex':
+            for regex in searchmethod['regexes']:
+                matches += re.findall(regex, html, re.DOTALL)
+        else:
+            res = json.loads(html)
+            matches = [im['#text'] for im in res['artist']['image'] if im['size'] == 'large']
+            if len(matches) == 0:
+                matches = ['https://commons.wikimedia.org/wiki/Category:Blank#/media/File:Love_(4334495470).jpg']
         return matches
 
     def fetch(self, searchterm):
