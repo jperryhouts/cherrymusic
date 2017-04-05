@@ -222,7 +222,7 @@ function loadConfig(executeAfter){
         } else {
             $('#albumart-search-method').hide();
         }
-        $('#aboutModal #cherrymusic-version').html(SERVER_CONFIG.version)
+        $('#cherrymusic-version').html(SERVER_CONFIG.version)
     };
     var error = errorFunc("Could not fetch client configuration, CherryMusic will not work. Clearing the browser cache might help.");
     api('getconfiguration', {}, success, error);
