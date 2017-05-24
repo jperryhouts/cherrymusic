@@ -1490,7 +1490,7 @@ function search($form){"use strict";var $input=$form.find('input');if($input.val
 var searchstring=$input.val();var success=function(json){$('.searchinput').removeClass('searchinput-busy');new MediaBrowser('.search-results',json,'Search: '+htmlencode(searchstring));};var error=function(){$('.searchinput').removeClass('searchinput-busy');errorFunc('failed loading search results')();};$('.searchinput').addClass('searchinput-busy');api('search',{'searchstring':searchstring},success,error);return false;}
 function submitsearch(){search();return false;}
 ext2jPlayerFormat=function(ext){switch(ext){case"mp3":return"mp3";case"ogg":case"opus":case"oga":return"oga";case"m4a":case"mp4":case"aac":return"m4a";case"flac":return"flac"
-case"wav":return"wav";case"weba":return"webma";}}
+case"wav":return"wav";case"weba":return"webma";case:"mkv":case:"mka":return"mkv";}}
 function savePlaylistAndHideDialog(){"use strict";var name=$('#playlisttitle').val();var pub=$('#playlistpublic').prop('checked')?true:false;if(name.trim()!==''){var pl=playlistManager.newPlaylistFromEditing();savePlaylist(pl.id,name,pub);$('#saveplaylistmodal').modal('hide');}
 $(this).blur();return false;}
 function savePlaylist(plid,playlistname,ispublic,overwrite){"use strict";var pl=playlistManager.getPlaylistById(plid);overwrite=Boolean(overwrite);ispublic=ispublic||pl.public;playlistname=playlistname||pl.name;var success=function(){playlistManager.getPlaylistById(plid).name=playlistname;playlistManager.getPlaylistById(plid).public=ispublic;playlistManager.getPlaylistById(plid).saved=true;playlistManager.refresh();playlistManager.showPlaylist(plid);}

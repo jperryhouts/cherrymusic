@@ -39,6 +39,8 @@ MIMETYPES = {
     'wav': 'audio/wav',
     'wma' : 'audio/x-ms-wma',
     'opus': 'audio/ogg; codecs=opus',
+    'mkv': 'audio/x-matroska',
+    'mka': 'audio/x-matroska',
 }
 
 
@@ -213,6 +215,8 @@ class AudioTranscode:
         Decoder('m4a', ['faad', '-w', 'INPUT']),
         Decoder('wav', ['cat', 'INPUT']),
         Decoder('opus', ['opusdec', 'INPUT', '--force-wav', '--quiet', '-']),
+        Decoder('mkv', ['ffmpeg', '-i', 'INPUT', '-f', 'wav', '-acodec', 'pcm_s16le', '-']),
+        Decoder('mka', ['ffmpeg', '-i', 'INPUT', '-f', 'wav', '-acodec', 'pcm_s16le', '-']),
     ]
 
     def __init__(self, debug=False):

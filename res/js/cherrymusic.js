@@ -408,6 +408,9 @@ ext2jPlayerFormat = function(ext){
         case "wav": return "wav";
 
         case "weba": return "webma";
+
+        case "mkv":
+        case "mka": return "mkv";
     }
 }
 
