@@ -659,9 +659,9 @@ class HTTPHandler(object):
        # sess['userid'] = None
        # if username:
        #     cherrypy.request.login = None
-       cherrypy.session['username'] = None
-       cherrypy.session['userid'] = None
-       cherrypy.session['admin'] = None
+        cherrypy.session['username'] = None
+        cherrypy.session['userid'] = None
+        cherrypy.session['admin'] = None
     api_logout.no_auth = True
 
     def api_downloadpls(self, plid, hostaddr):
