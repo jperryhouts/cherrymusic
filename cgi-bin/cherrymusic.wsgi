@@ -55,6 +55,7 @@ cherrypy.config.update({
         'server.thread_pool': 30,
         'tools.sessions.on': True,
         'tools.sessions.timeout': int(cherrymusicserver.config.get('server.session_duration', 60 * 24)),
+        'tools.sessions.locking': 'early'
     })
 
 if cherrymusicserver.config['server.keep_session_in_ram']:
